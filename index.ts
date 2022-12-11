@@ -46,6 +46,9 @@ of(10, 50, 100, 150)
 
 console.log('-------------------custom number map--------------');
 
+/**
+ * NB: Does not work like the normal rxjs map esp. on error handling
+ */
 const myNumberMapper = (transformationFn: (val: number) => number | Error) => {
   return (input: Observable<number>) => {
     return new Observable((observer) => {
@@ -58,21 +61,22 @@ const myNumberMapper = (transformationFn: (val: number) => number | Error) => {
   };
 };
 
+const mainDiv = document.querySelector('.main-message') as HTMLElement;
 const errorDiv = document.querySelector('.error-message') as HTMLElement;
-errorDiv.style.color = 'white';
-errorDiv.style.fontSize = 20 + 'px';
+mainDiv.style.color = 'white';
+mainDiv.style.fontSize = 20 + 'px';
 
 of(1, 2, 3, 4)
   .pipe(
     myNumberMapper((x: number) => {
       if (x === 3) {
-        throwError(() => new Error(`Errored ${x} ${Date.now()}`));
+        throw `Errored ${x} ${Date.now()}`;
       } else {
         return x + 2;
       }
     }),
     catchError((err) => {
-      console.log(err);
+      console.warn('Caught it! ', err);
       return throwError(() => err);
     })
   )
@@ -81,7 +85,7 @@ of(1, 2, 3, 4)
       console.log(x);
       const div: HTMLElement = document.createElement('div');
       div.append(`${x}`);
-      errorDiv.appendChild(div);
+      mainDiv.appendChild(div);
     },
     error: (myErr) => {
       console.error('Came through: ', myErr);
@@ -90,7 +94,7 @@ of(1, 2, 3, 4)
       const anotherDiv = document.createElement('div');
       anotherDiv.style.marginBottom = 24 + 'px';
       anotherDiv.append(document.createTextNode('Done Custom Mapper'));
-      errorDiv.appendChild(anotherDiv);
+      mainDiv.appendChild(anotherDiv);
     },
   });
 
@@ -107,7 +111,7 @@ of(1, 2, 3, 4)
     }),
     catchError((err) => {
       console.warn('Caught it! ', err);
-      return of(err);
+      return throwError(() => err);
     })
   )
   .subscribe({
@@ -115,15 +119,16 @@ of(1, 2, 3, 4)
       console.log(x);
       const div: HTMLElement = document.createElement('div');
       div.append(`${x}`);
-      errorDiv.appendChild(div);
+      mainDiv.appendChild(div);
     },
     error: (myErr) => {
-      console.error('Came through: ', myErr);
+      errorDiv.style.color = 'yellow';
+      errorDiv.append(document.createTextNode(myErr));
     },
     complete: () => {
       const anotherDiv = document.createElement('div');
       anotherDiv.style.marginBottom = 24 + 'px';
       anotherDiv.append(document.createTextNode('Done'));
-      errorDiv.appendChild(anotherDiv);
+      mainDiv.appendChild(anotherDiv);
     },
   });
