@@ -9,6 +9,7 @@ import {
   take,
   Subject,
   BehaviorSubject,
+  catchError,
 } from 'rxjs';
 
 console.log('----------------//-----------------------');
@@ -56,5 +57,18 @@ const myNumberMapper = (transformationFn: (val: number) => number) => {
 };
 
 of(1, 2, 3, 4)
-  .pipe(myNumberMapper((x: number) => x + 2))
-  .subscribe(console.log);
+  .pipe(
+    myNumberMapper((x: number) => {
+      if (x === 3) {
+        throw new Error(`Errored ${x}`);
+      } else {
+        return x + 2;
+      }
+    }),
+    catchError((err) => of(err))
+  )
+  .subscribe({
+    next: console.log,
+    error: console.error,
+    complete: console.warn,
+  });
