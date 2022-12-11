@@ -9,9 +9,9 @@ import {
   take,
   Subject,
   BehaviorSubject,
-  catchError,
   EMPTY,
   throwError,
+  catchError,
 } from 'rxjs';
 
 console.log('----------------//-----------------------');
@@ -44,7 +44,7 @@ of(10, 50, 100, 150)
     complete: console.log,
   });
 
-console.log('-------------------custom number mapper--------------');
+console.log('-------------------custom number map--------------');
 
 const myNumberMapper = (transformationFn: (val: number) => number | Error) => {
   return (input: Observable<number>) => {
@@ -66,7 +66,7 @@ of(1, 2, 3, 4)
   .pipe(
     myNumberMapper((x: number) => {
       if (x === 3) {
-        throwError(() => `Errored ${x} ${Date.now()}`);
+        throwError(() => new Error(`Errored ${x} ${Date.now()}`));
       } else {
         return x + 2;
       }
@@ -77,7 +77,7 @@ of(1, 2, 3, 4)
     })
   )
   .subscribe({
-    next: (x: number) => {
+    next: (x: number | unknown) => {
       console.log(x);
       const div: HTMLElement = document.createElement('div');
       div.append(`${x}`);
@@ -87,4 +87,37 @@ of(1, 2, 3, 4)
       console.error('Came through: ', myErr);
     },
     complete: console.log,
+  });
+
+console.log('-------------------regular rxjs map--------------');
+
+of(1, 2, 3, 4)
+  .pipe(
+    map((x: number) => {
+      if (x === 3) {
+        throw `Errored ${x} ${Date.now()}`;
+      } else {
+        return x + 2;
+      }
+    }),
+    catchError((err) => {
+      console.warn('Caught it! ', err);
+      return of(err);
+    })
+  )
+  .subscribe({
+    next: (x: number | unknown) => {
+      console.log(x);
+      const div: HTMLElement = document.createElement('div');
+      div.append(`${x}`);
+      errorDiv.appendChild(div);
+    },
+    error: (myErr) => {
+      console.error('Came through: ', myErr);
+    },
+    complete: () => {
+      const h1 = document.createElement('h1');
+      h1.append(document.createTextNode('Done'));
+      errorDiv.appendChild(h1);
+    },
   });
