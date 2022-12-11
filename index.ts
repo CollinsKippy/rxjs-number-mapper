@@ -66,14 +66,14 @@ of(1, 2, 3, 4)
   .pipe(
     myNumberMapper((x: number) => {
       if (x === 3) {
-        throw new Error(`Errored ${x} ${Date.now()}`);
+        throwError(() => `Errored ${x} ${Date.now()}`);
       } else {
         return x + 2;
       }
     }),
     catchError((err) => {
       console.warn(err);
-      return of(err);
+      return throwError(() => err);
     })
   )
   .subscribe({
