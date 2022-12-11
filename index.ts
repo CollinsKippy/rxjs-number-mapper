@@ -58,22 +58,32 @@ const myNumberMapper = (transformationFn: (val: number) => number) => {
   };
 };
 
+const errorDiv = document.querySelector('.error-message') as HTMLElement;
+errorDiv.style.color = 'white';
+errorDiv.style.fontSize = 20 + 'px';
+
 of(1, 2, 3, 4)
   .pipe(
     myNumberMapper((x: number) => {
       if (x === 3) {
-        throwError(() => new Error(`Errored ${x} ${Date.now}`));
+        throwError(() => new Error(`Errored ${x} ${Date.now()}`));
       } else {
         return x + 2;
       }
+    }),
+    catchError((err) => {
+      console.warn(`CatchError: ${err}`);
+      errorDiv.textContent = err;
+      return of(err);
     })
-    // catchError((err) => {
-    //   console.warn(`CatchError: ${err}`);
-    //   return EMPTY;
-    // })
   )
   .subscribe({
-    next: (x) => console.log(x),
+    next: (x: number) => {
+      console.log(x);
+      const div: HTMLElement = document.createElement('div');
+      div.append(`${x}`);
+      errorDiv.appendChild(div);
+    },
     error: (myErr) => console.error('Came through: ', myErr),
     complete: console.log,
   });
