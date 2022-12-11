@@ -10,6 +10,8 @@ import {
   Subject,
   BehaviorSubject,
   catchError,
+  EMPTY,
+  throwError,
 } from 'rxjs';
 
 console.log('----------------//-----------------------');
@@ -60,15 +62,18 @@ of(1, 2, 3, 4)
   .pipe(
     myNumberMapper((x: number) => {
       if (x === 3) {
-        throw new Error(`Errored ${x}`);
+        throwError(() => new Error(`Errored ${x} ${Date.now}`));
       } else {
         return x + 2;
       }
-    }),
-    catchError((err) => of(err))
+    })
+    // catchError((err) => {
+    //   console.warn(`CatchError: ${err}`);
+    //   return EMPTY;
+    // })
   )
   .subscribe({
-    next: console.log,
-    error: console.error,
-    complete: console.warn,
+    next: (x) => console.log(x),
+    error: (myErr) => console.error('Came through: ', myErr),
+    complete: console.log,
   });
