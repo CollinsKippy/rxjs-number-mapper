@@ -72,7 +72,7 @@ of(1, 2, 3, 4)
       }
     }),
     catchError((err) => {
-      console.warn(err);
+      console.log(err);
       return throwError(() => err);
     })
   )
