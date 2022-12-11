@@ -86,7 +86,12 @@ of(1, 2, 3, 4)
     error: (myErr) => {
       console.error('Came through: ', myErr);
     },
-    complete: console.log,
+    complete: () => {
+      const anotherDiv = document.createElement('div');
+      anotherDiv.style.marginBottom = 24 + 'px';
+      anotherDiv.append(document.createTextNode('Done Custom Mapper'));
+      errorDiv.appendChild(anotherDiv);
+    },
   });
 
 console.log('-------------------regular rxjs map--------------');
@@ -116,8 +121,9 @@ of(1, 2, 3, 4)
       console.error('Came through: ', myErr);
     },
     complete: () => {
-      const h1 = document.createElement('h1');
-      h1.append(document.createTextNode('Done'));
-      errorDiv.appendChild(h1);
+      const anotherDiv = document.createElement('div');
+      anotherDiv.style.marginBottom = 24 + 'px';
+      anotherDiv.append(document.createTextNode('Done'));
+      errorDiv.appendChild(anotherDiv);
     },
   });
