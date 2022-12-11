@@ -74,7 +74,7 @@ of(1, 2, 3, 4)
     catchError((err) => {
       console.warn(`CatchError: ${err}`);
       errorDiv.textContent = err;
-      return of(err);
+      return throwError(() => `Errored ${err} ${Date.now()}`);
     })
   )
   .subscribe({
@@ -84,6 +84,11 @@ of(1, 2, 3, 4)
       div.append(`${x}`);
       errorDiv.appendChild(div);
     },
-    error: (myErr) => console.error('Came through: ', myErr),
+    error: (myErr) => {
+      console.error('Came through: ', myErr);
+      const div: HTMLElement = document.createElement('div');
+      div.append(`${myErr}`);
+      errorDiv.appendChild(div);
+    },
     complete: console.log,
   });
