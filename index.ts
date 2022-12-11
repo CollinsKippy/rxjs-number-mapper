@@ -100,6 +100,8 @@ of(1, 2, 3, 4)
 
 console.log('-------------------regular rxjs map--------------');
 
+// Works well at error handling compared to the customer mapper above.
+
 of(1, 2, 3, 4)
   .pipe(
     map((x: number) => {
